@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 style="color:#ffd200;">🛒 {{ title }}</h2>
+<div class="service-grid">
+    {% for service in services %}
+        <div class="service-card" onclick="window.location='/service/{{ service.id }}'">
+            <h3>{{ service.title }}</h3>
+            <p>{{ service.description[:100] }}{% if service.description|length > 100 %}...{% endif %}</p>
+            <p style="color:#a0aec0;font-size:14px;">{{ service.category }}</p>
+            <p class="price">{{ service.price }} ₽</p>
+            <p class="seller">👤 {{ service.seller.username }}</p>
+            <p class="expires">⏳ До: {{ service.expires_at.strftime('%d.%m.%Y %H:%M') }}</p>
+            <a href="/buy-service/{{ service.id }}" class="btn">Купить</a>
+            <a href="/service/{{ service.id }}" class="btn btn-blue" style="margin-left:10px;">Подробнее</a>
+        </div>
+    {% else %}<p style="color:#a0aec0;">Услуг не найдено</p>{% endfor %}
+</div>
+{% endblock %}
