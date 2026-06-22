@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 style="color:#f59e0b;">📋 {{ title }}</h2>
+<div class="service-grid">
+    {% for task in tasks %}
+        <div class="task-card" onclick="window.location='/task/{{ task.id }}'">
+            <h3>{{ task.title }}</h3>
+            <p>{{ task.description[:100] }}{% if task.description|length > 100 %}...{% endif %}</p>
+            <p style="color:#a0aec0;font-size:14px;">{{ task.category }}</p>
+            <p class="price">{{ task.price }} ₽</p>
+            <p class="client">👤 Заказчик: {{ task.client.username }}</p>
+            <p class="expires">⏳ До: {{ task.expires_at.strftime('%d.%m.%Y %H:%M') }}</p>
+            <a href="/take-task/{{ task.id }}" class="btn">Взять задание</a>
+            <a href="/task/{{ task.id }}" class="btn btn-blue" style="margin-left:10px;">Подробнее</a>
+        </div>
+    {% else %}<p style="color:#a0aec0;">Заданий не найдено</p>{% endfor %}
+</div>
+{% endblock %}
