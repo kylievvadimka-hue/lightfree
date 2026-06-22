@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="form-container">
+    <h2>📋 Создать задание</h2>
+    <form method="post">
+        <input type="text" name="title" placeholder="Название задания" required>
+        <textarea name="description" placeholder="Что нужно сделать? Подробное описание" required></textarea>
+        <input type="number" name="price" step="0.01" placeholder="Бюджет в ₽" required>
+        <input type="text" name="category" placeholder="Категория" required>
+        <h4 style="color:#f59e0b;margin:20px 0 10px;">⏳ Срок выполнения</h4>
+        <div class="form-row">
+            <div class="form-group"><label>Дни</label><input type="number" name="days" value="3" min="0"></div>
+            <div class="form-group"><label>Часы</label><input type="number" name="hours" value="0" min="0" max="23"></div>
+            <div class="form-group"><label>Минуты</label><input type="number" name="minutes" value="0" min="0" max="59"></div>
+        </div>
+        <button type="submit">📢 Опубликовать задание</button>
+    </form>
+</div>
+{% endblock %}
