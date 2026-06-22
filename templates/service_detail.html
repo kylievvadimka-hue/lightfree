@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="service-detail-card">
+    <h1>{{ service.title }}</h1>
+    <p style="color:#a0aec0;font-size:16px;">📌 {{ service.category }}</p>
+    <p class="price">{{ service.price }} ₽</p>
+    <div class="description">{{ service.description }}</div>
+    <div>
+        <p>👤 Продавец: <a href="/profile" style="color:#ffd200;">{{ service.seller.username }}</a></p>
+        <p>📅 Создано: {{ service.created_at.strftime('%d.%m.%Y %H:%M') }}</p>
+        <p>⏳ Истекает: {{ service.expires_at.strftime('%d.%m.%Y %H:%M') }}</p>
+    </div>
+    <br>
+    <a href="/buy-service/{{ service.id }}" class="btn">💳 Купить</a>
+    {% if user and user.is_developer %}
+        <form method="post" action="/developer/delete-service/{{ service.id }}" style="display:inline;margin-left:10px;">
+            <button type="submit" class="btn btn-red" onclick="return confirm('Удалить услугу?')">🗑️ Удалить (админ)</button>
+        </form>
+    {% endif %}
+</div>
+{% endblock %}
