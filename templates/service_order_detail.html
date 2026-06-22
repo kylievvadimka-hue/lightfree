@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="max-width:800px;margin:0 auto;">
+    <h2 style="color:#ffd200;">📦 Заказ #{{ order.id }}</h2>
+    <div style="background:#14181f;border:1px solid #2a313c;border-radius:12px;padding:20px;margin-bottom:20px;">
+        <p><strong>Услуга:</strong> {{ order.service.title }}</p>
+        <p><strong>Сумма:</strong> {{ "%.2f"|format(order.amount) }} ₽</p>
+        <p><strong>Статус:</strong> <span class="status-{{ order.status }}">{{ order.status }}</span></p>
+        {% if order.buyer_id == session.user_id and order.status == 'pending' %}
+            <a href="/service-payment/{{ order.id }}" class="btn">💳 Оплатить</a>
+        {% endif %}
+        {% if order.seller_id == session.user_id and order.status == 'paid' %}
+            <form method="post" action="/complete-service-order/{{ order.id }}" style="margin-top:15px;">
+                <button type="submit" class="btn">✅ Завершить заказ</button>
+            </form>
+        {% endif %}
+    </div>
+    <div style="background:#14181f;border:1px solid #2a313c;border-radius:12px;padding:20px;">
+        <h3 style="color:#ffd200;">💬 Чат</h3>
+        <div class="chat-box" id="chatBox">
+            {% for msg in messages %}
+                <div class="message">
+                    <span class="sender">{{ msg.sender.username }}</span>
+                    <span class="time">{{ msg.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                    <div class="text">{{ msg.text }}</div>
+                </div>
+            {% endfor %}
+        </div>
+        <form id="messageForm" style="display:flex;gap:10px;">
+            <input type="text" id="messageInput" placeholder="Сообщение..." style="flex:1;padding:12px;background:#0b0e14;border:1px solid #2a313c;border-radius:8px;color:#e4e6eb;">
+            <button type="submit" class="btn">Отправить</button>
+        </form>
+    </div>
+</div>
+<script>
+const orderId = {{ order.id }};
+const orderType = 'service';
+const chatBox = document.getElementById('chatBox');
+
+document.getElementById('messageForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const input = document.getElementById('messageInput');
+    const text = input.value.trim();
+    if (!text) return;
+    
+    fetch('/send-message', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: `order_id=${orderId}&order_type=${orderType}&text=${encodeURIComponent(text)}`
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.error) { alert(data.error); return; }
+        input.value = '';
+        const msg = document.createElement('div');
+        msg.className = 'message';
+        msg.innerHTML = `<span class="sender">{{ session.username }}</span><span class="time">${data.created_at}</span><div class="text">${data.text}</div>`;
+        chatBox.appendChild(msg);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    });
+});
+
+setInterval(() => {
+    fetch(`/api/messages/${orderType}/${orderId}`)
+        .then(r => r.json())
+        .then(messages => {
+            const currentCount = chatBox.children.length;
+            if (messages.length > currentCount) {
+                chatBox.innerHTML = messages.map(m => 
+                    `<div class="message"><span class="sender">${m.sender}</span><span class="time">${m.created_at}</span><div class="text">${m.text}</div></div>`
+                ).join('');
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+        });
+}, 3000);
+</script>
+{% endblock %}
