@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="max-width:600px;margin:0 auto;background:#14181f;border:1px solid #2a313c;border-radius:16px;padding:40px;">
+    <h2 style="color:#ffd200;">💳 Оплата услуги</h2>
+    <div class="payment-info">
+        <p class="label">📌 Услуга</p>
+        <p class="value">{{ order.service.title }}</p>
+        <p class="label">💰 Сумма</p>
+        <p class="value" style="color:#ffd200;font-size:24px;">{{ "%.2f"|format(order.amount) }} ₽</p>
+        <p class="label">📊 Комиссия (10%)</p>
+        <p class="value">{{ "%.2f"|format(order.commission) }} ₽</p>
+        <p class="label">👤 Продавец</p>
+        <p class="value">{{ seller.full_name or seller.username }}</p>
+    </div>
+    <div style="background:#1a1f2a;padding:20px;border-radius:12px;margin:20px 0;border:1px solid #ffd200;">
+        <h3 style="color:#ffd200;text-align:center;">💳 Реквизиты продавца</h3>
+        <p style="text-align:center;font-size:20px;font-weight:700;margin:15px 0;">{{ seller.card_number or 'Не указаны' }}</p>
+        <p style="text-align:center;color:#a0aec0;">{{ seller.bank_name or 'Банк не указан' }}</p>
+        <p style="text-align:center;color:#a0aec0;">👤 {{ seller.full_name or seller.username }}</p>
+    </div>
+    <form method="post" action="/confirm-service-payment/{{ order.id }}">
+        <button type="submit" class="btn" style="width:100%;">✅ Я оплатил</button>
+    </form>
+</div>
+{% endblock %}
