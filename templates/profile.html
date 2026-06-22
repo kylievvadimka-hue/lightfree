@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="max-width:900px;margin:0 auto;">
+    <h2 style="color:#ffd200;">👤 Профиль {{ user.username }}
+        {% if user.is_developer %}<span class="developer-badge">🔧 Разработчик</span>{% endif %}
+        {% if user.is_blocked %}<span class="blocked-badge">🚫 Заблокирован</span>{% endif %}
+    </h2>
+    
+    <div class="profile-section">
+        <h3 style="color:#ffd200;">📋 Личные данные</h3>
+        <form method="post">
+            <input type="text" name="full_name" value="{{ user.full_name or '' }}" placeholder="Полное имя" style="width:100%;padding:10px;margin-bottom:10px;background:#0b0e14;border:1px solid #2a313c;border-radius:8px;color:#e4e6eb;">
+            <input type="text" name="phone" value="{{ user.phone or '' }}" placeholder="Телефон" style="width:100%;padding:10px;margin-bottom:10px;background:#0b0e14;border:1px solid #2a313c;border-radius:8px;color:#e4e6eb;">
+            <h4 style="color:#ffd200;margin:15px 0 10px;">💳 Реквизиты</h4>
+            <input type="text" name="card_number" value="{{ user.card_number or '' }}" placeholder="Номер карты" style="width:100%;padding:10px;margin-bottom:10px;background:#0b0e14;border:1px solid #2a313c;border-radius:8px;color:#e4e6eb;">
+            <input type="text" name="bank_name" value="{{ user.bank_name or '' }}" placeholder="Название банка" style="width:100%;padding:10px;margin-bottom:10px;background:#0b0e14;border:1px solid #2a313c;border-radius:8px;color:#e4e6eb;">
+            <button type="submit" class="btn">💾 Сохранить</button>
+        </form>
+    </div>
+    
+    <div class="profile-section">
+        <h3 style="color:#ffd200;">📊 Статистика</h3>
+        <div class="stat-grid">
+            <div class="stat-item"><div class="stat-value">{{ total_bought }}</div><div class="stat-label">🛒 Куплено услуг</div></div>
+            <div class="stat-item"><div class="stat-value">{{ "%.2f"|format(total_spent) }} ₽</div><div class="stat-label">💰 Потрачено</div></div>
+            <div class="stat-item"><div class="stat-value">{{ total_sold }}</div><div class="stat-label">📦 Продано услуг</div></div>
+            <div class="stat-item"><div class="stat-value">{{ "%.2f"|format(total_earned) }} ₽</div><div class="stat-label">💵 Заработано</div></div>
+            <div class="stat-item"><div class="stat-value">{{ total_tasks_client }}</div><div class="stat-label">📋 Создано заданий</div></div>
+            <div class="stat-item"><div class="stat-value">{{ total_tasks_executor }}</div><div class="stat-label">✅ Взято заданий</div></div>
+            <div class="stat-item"><div class="stat-value">{{ active_services }}</div><div class="stat-label">📌 Активных услуг</div></div>
+        </div>
+    </div>
+    
+    {% if user.is_developer %}
+    <div class="profile-section" style="border:2px solid #8b5cf6;">
+        <h3 style="color:#8b5cf6;">🔧 Панель разработчика</h3>
+        <h4 style="color:#ffd200;margin-top:15px;">➕ Добавить разработчика</h4>
+        <form method="post" action="/developer/add" style="display:flex;gap:10px;">
+            <input type="text" name="username" placeholder="Логин" style="flex:1;padding:10px;background:#0b0e14;border:1px solid #2a313c;border-radius:8px;color:#e4e6eb;">
+            <button type="submit" class="btn btn-purple">Назначить</button>
+        </form>
+        <h4 style="color:#ffd200;margin-top:15px;">❌ Лишить прав</h4>
+        <form method="post" action="/developer/remove" style="display:flex;gap:10px;">
+            <input type="text" name="username" placeholder="Логин" style="flex:1;padding:10px;background:#0b0e14;border:1px solid #2a313c;border-radius:8px;color:#e4e6eb;">
+            <button type="submit" class="btn btn-red">Лишить прав</button>
+        </form>
+        <h4 style="color:#ffd200;margin-top:15px;">🚫 Блокировка</h4>
+        <form method="post" action="/developer/block" style="display:flex;gap:10px;">
+            <input type="text" name="username" placeholder="Логин" style="flex:1;padding:10px;background:#0b0e14;border:1px solid #2a313c;border-radius:8px;color:#e4e6eb;">
+            <button type="submit" class="btn btn-red">Заблокировать</button>
+        </form>
+        <h4 style="color:#ffd200;margin-top:15px;">🔓 Разблокировка</h4>
+        <form method="post" action="/developer/unblock" style="display:flex;gap:10px;">
+            <input type="text" name="username" placeholder="Логин" style="flex:1;padding:10px;background:#0b0e14;border:1px solid #2a313c;border-radius:8px;color:#e4e6eb;">
+            <button type="submit" class="btn">Разблокировать</button>
+        </form>
+        <h4 style="color:#ffd200;margin-top:15px;">👥 Пользователи</h4>
+        <div style="max-height:300px;overflow-y:auto;">
+            {% for u in all_users %}
+                <div style="display:flex;justify-content:space-between;padding:8px;background:#0b0e14;border-radius:8px;margin-bottom:5px;align-items:center;">
+                    <span>{{ u.username }}{% if u.is_developer %} 🔧{% endif %}{% if u.is_blocked %} 🚫{% endif %}</span>
+                    <span style="color:#a0aec0;font-size:12px;">{{ u.full_name or '' }}</span>
+                </div>
+            {% endfor %}
+        </div>
+        <h4 style="color:#ffd200;margin-top:15px;">💰 Баланс платформы</h4>
+        <p style="font-size:24px;font-weight:700;color:#ffd200;">{{ "%.2f"|format(admin_balance.total_commission) }} ₽</p>
+        <p style="color:#a0aec0;">💳 Карта: 5536092301335542</p>
+    </div>
+    {% endif %}
+    
+    <div class="profile-section">
+        <h3 style="color:#ffd200;">🛒 Покупки услуг</h3>
+        {% for order in service_orders_buyer %}
+            <div style="padding:10px;background:#0b0e14;border-radius:8px;margin-bottom:8px;border-left:3px solid #ffd200;">
+                {{ order.service.title }} — {{ "%.2f"|format(order.amount) }} ₽ <span class="status-{{ order.status }}">({{ order.status }})</span>
+                <a href="/service-order/{{ order.id }}" class="btn" style="padding:4px 12px;font-size:12px;float:right;">Подробнее</a>
+            </div>
+        {% else %}<p style="color:#a0aec0;">Нет покупок</p>{% endfor %}
+    </div>
+    
+    <div class="profile-section">
+        <h3 style="color:#ffd200;">📦 Продажи услуг</h3>
+        {% for order in service_orders_seller %}
+            <div style="padding:10px;background:#0b0e14;border-radius:8px;margin-bottom:8px;border-left:3px solid #ffd200;">
+                {{ order.service.title }} — {{ "%.2f"|format(order.amount) }} ₽ <span class="status-{{ order.status }}">({{ order.status }})</span>
+                <a href="/service-order/{{ order.id }}" class="btn" style="padding:4px 12px;font-size:12px;float:right;">Подробнее</a>
+            </div>
+        {% else %}<p style="color:#a0aec0;">Нет продаж</p>{% endfor %}
+    </div>
+    
+    <div class="profile-section">
+        <h3 style="color:#f59e0b;">📋 Мои задания (как заказчик)</h3>
+        {% for task in task_orders_client %}
+            <div style="padding:10px;background:#0b0e14;border-radius:8px;margin-bottom:8px;border-left:3px solid #f59e0b;">
+                {{ task.title }} — {{ "%.2f"|format(task.price) }} ₽ <span class="status-{{ task.status }}">({{ task.status }})</span>
+                <a href="/task-order/{{ task.id }}" class="btn" style="padding:4px 12px;font-size:12px;float:right;">Подробнее</a>
+            </div>
+        {% else %}<p style="color:#a0aec0;">Нет заданий</p>{% endfor %}
+    </div>
+    
+    <div class="profile-section">
+        <h3 style="color:#f59e0b;">✅ Задания в работе (как исполнитель)</h3>
+        {% for task in task_orders_executor %}
+            <div style="padding:10px;background:#0b0e14;border-radius:8px;margin-bottom:8px;border-left:3px solid #f59e0b;">
+                {{ task.title }} — {{ "%.2f"|format(task.price) }} ₽ <span class="status-{{ task.status }}">({{ task.status }})</span>
+                <a href="/task-order/{{ task.id }}" class="btn" style="padding:4px 12px;font-size:12px;float:right;">Подробнее</a>
+            </div>
+        {% else %}<p style="color:#a0aec0;">Нет заданий в работе</p>{% endfor %}
+    </div>
+</div>
+{% endblock %}
