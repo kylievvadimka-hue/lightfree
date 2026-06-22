@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="hero">
+    <h1>Покупайте услуги и находите исполнителей</h1>
+    <p style="color:#a0aec0;font-size:18px;">🔒 Безопасные сделки с защитой покупателя и продавца</p>
+    <span style="display:inline-block;background:#22c55e;color:#0b0e14;padding:6px 16px;border-radius:20px;font-weight:600;font-size:14px;margin-top:15px;">🛡️ Защита сделки</span>
+    {% if not session.user_id %}<br><br><a href="/register" class="btn">Начать зарабатывать</a>{% endif %}
+</div>
+<div class="categories">
+    <h2 style="color:#ffd200;">📂 Категории</h2>
+    <div class="category-list">
+        {% for cat in categories %}<a href="/services/category/{{ cat }}" class="category-item">{{ cat }}</a>{% endfor %}
+        {% if not categories %}<span style="color:#a0aec0;">Пока нет категорий</span>{% endif %}
+    </div>
+</div>
+<div class="grid-2col">
+    <div>
+        <h2 class="section-title">🛒 Услуги</h2>
+        <div class="service-grid">
+            {% for service in services %}
+                <div class="service-card" onclick="window.location='/service/{{ service.id }}'">
+                    <h3>{{ service.title }}</h3>
+                    <p style="color:#a0aec0;font-size:14px;">{{ service.category }}</p>
+                    <p class="price">{{ service.price }} ₽</p>
+                    <p class="seller">👤 {{ service.seller.username }}</p>
+                    <p class="expires">⏳ {{ service.expires_at.strftime('%d.%m.%Y') }}</p>
+                    <a href="/buy-service/{{ service.id }}" class="btn">Купить</a>
+                    <a href="/service/{{ service.id }}" class="btn btn-blue" style="margin-left:10px;">Подробнее</a>
+                </div>
+            {% else %}<p style="color:#a0aec0;">Услуг пока нет.</p>{% endfor %}
+        </div>
+        <br><a href="/services" class="btn btn-blue">Все услуги →</a>
+    </div>
+    <div>
+        <h2 class="section-title-green">📋 Задания</h2>
+        <div class="service-grid">
+            {% for task in tasks %}
+                <div class="task-card" onclick="window.location='/task/{{ task.id }}'">
+                    <h3>{{ task.title }}</h3>
+                    <p style="color:#a0aec0;font-size:14px;">{{ task.category }}</p>
+                    <p class="price">{{ task.price }} ₽</p>
+                    <p class="client">👤 Заказчик: {{ task.client.username }}</p>
+                    <p class="expires">⏳ До: {{ task.expires_at.strftime('%d.%m.%Y') }}</p>
+                    <a href="/take-task/{{ task.id }}" class="btn">Взять задание</a>
+                    <a href="/task/{{ task.id }}" class="btn btn-blue" style="margin-left:10px;">Подробнее</a>
+                </div>
+            {% else %}<p style="color:#a0aec0;">Заданий пока нет.</p>{% endfor %}
+        </div>
+        <br><a href="/tasks" class="btn">Все задания →</a>
+    </div>
+</div>
+{% endblock %}
