@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="task-detail-card">
+    <h1>{{ task.title }}</h1>
+    <p style="color:#a0aec0;font-size:16px;">📌 {{ task.category }}</p>
+    <p class="price">{{ task.price }} ₽</p>
+    <div class="description">{{ task.description }}</div>
+    <div>
+        <p>👤 Заказчик: <a href="/profile" style="color:#f59e0b;">{{ task.client.username }}</a></p>
+        <p>📅 Создано: {{ task.created_at.strftime('%d.%m.%Y %H:%M') }}</p>
+        <p>⏳ До: {{ task.expires_at.strftime('%d.%m.%Y %H:%M') }}</p>
+        <p>📊 Статус: <span class="status-{{ task.status }}">{{ task.status }}</span></p>
+        {% if task.executor %}
+            <p>👤 Исполнитель: {{ task.executor.username }}</p>
+        {% endif %}
+    </div>
+    <br>
+    {% if task.status == 'open' %}
+        <a href="/take-task/{{ task.id }}" class="btn">✅ Взять задание</a>
+    {% elif task.status == 'in_progress' and session.user_id == task.executor_id %}
+        <a href="/task-order/{{ task.id }}" class="btn btn-blue">📦 Перейти к заданию</a>
+    {% elif task.status == 'in_progress' and session.user_id == task.client_id %}
+        <a href="/task-order/{{ task.id }}" class="btn btn-blue">📦 Перейти к заданию</a>
+    {% elif task.status == 'completed' %}
+        <span class="btn" style="cursor:default;">✅ Задание выполнено</span>
+    {% endif %}
+    {% if user and user.is_developer %}
+        <form method="post" action="/developer/delete-task/{{ task.id }}" style="display:inline;margin-left:10px;">
+            <button type="submit" class="btn btn-red" onclick="return confirm('Удалить задание?')">🗑️ Удалить (админ)</button>
+        </form>
+    {% endif %}
+</div>
+{% endblock %}
