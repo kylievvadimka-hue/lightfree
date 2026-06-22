@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="form-container">
+    <h2>🔐 Вход</h2>
+    <form method="post">
+        <input type="text" name="username" placeholder="Логин" required>
+        <input type="password" name="password" placeholder="Пароль" required>
+        <button type="submit">Войти</button>
+    </form>
+    <p style="text-align:center;margin-top:20px;color:#a0aec0;">Нет аккаунта? <a href="/register" style="color:#ffd200;">Зарегистрироваться</a></p>
+</div>
+{% endblock %}
